@@ -1,0 +1,26 @@
+meta,id,name,desc,exits_r,exits_s
+Battle Arena,0,Centre of the Arena,"A clear, grey area with white lines on the ground to mark a battle arena.",1|2|3|4,
+ARENA,1,NW of Centre,"An area to the northwest of the centre, with red accents marking the new space.",2|3|5|21|23,
+A four-pointed star battlefield.,2,NE of Centre,"A spot to the northeast of the centre, with blue accents to mark the new area.",8|22|23,
+25,3,SW of Centre,"A place the southwest of the centre, with yellow accents to mark the locale.",11|21|24,
+12,4,SE of Centre,"A field to the southeast of the centre, with green accents to outline the field.",2|3|14|22|24,
+24,5,Northwest Quadrant,"A red sub-arena with a tower looming over it, and slides to either side of it.",6|7|17,
+,6,NW Southern Slides,A slide which gradually turns from red to yellow.,,11|17
+,7,NW Eastern Slides,A slide which gradually turns from red to blue.,,8|17
+,8,Northeast Quadrant,"A blue sub-arena with a tower over it, and slides to either side.",9|10|18,
+,9,NE Western Slides,A slide which gradually turns from blue to red.,,5|18
+,10,NE Southern Slides,A slide which gradually turns from blue to green.,,14|18
+,11,Southwest Quadrant,"A yellow sub-arena with a tower planted over it, and slides to the sides.",12|13|19,
+,12,SW Northern Slides,A slide which gradually turns from yellow to red.,,5|19
+,13,SW Eastern Slides,A slide which gradually turns from yellow to green.,,14|19
+,14,Southeast Quadrant,"A green sub-arena with a tower watching over, and slides to either side.",15|16|20,
+,15,SE Western Slides,A slide which gradually turns from green to yellow.,,11|20
+,16,SE Northern Slides,A slide which gradually turns from green to blue.,,8|20
+,17,Northwest Tower,This red tower overlooks the northwestern arena.,,0|1
+,18,Northeast Tower,This blue tower overlooks the northeastern arena.,,0|2
+,19,Southwest Tower,This yellow tower overlooks the southwestern arena.,,0|3
+,20,Southeast Tower,This green tower overlooks the southeastern arena.,,0|4
+,21,Western Field,A field to the far west of the main arena.,22,17|19
+,22,Eastern Field,A field to the far east of the main arena.,,18|20
+,23,Northern Field,A field to the far north of the main arena.,24,17|18
+,24,Southern Field,A field to the far south of the main arena.,,19|20

@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "\\svrau570bsm00.oceania.corp.anz.com\pavonel$\My Documents\Python\Main.py", line 86, in <module>
+    fightRoom = max(i.travelFight, key=i.travelFight.count)
+ValueError: max() arg is an empty sequence

@@ -1,0 +1,17 @@
+meta,id,name,desc,exits_r,exits_s
+The Field,0,Grassy Field,"You find yourself in a grassy field, patches of dirt breaking up the greenery. A forest is in the distance.",1|2,
+FIELD,1,Around Standing Stones,"You are near an outcropping of rocks and standing stones, the exterior faces of which are carved with odd-looking runes.",2|5,
+"A wilderness arena with twists, turns and one-way exits.",2,Fallen Log,You are by a fallen tree with fungus growing on it. You don't think the mushroom growing from it is edible…,3|12,6
+16,3,Gravelly Steppe,"You're in a stony steppe covered in gravel. There's a way up the hill flanked by tufts of hardy swordgrass, and a shack off to the side.",10,4
+4,4,A Plateau,"You're atop a stony plateau overlooking a grassy field, a cool breeze blows. A muddy, gradual path leads back down.",,0
+16,5,In a Stone Circle,"You're in the middle of a whole lot of ancient stones, arranged in a circle. You can smell the magic hanging in the air here…",,
+,6,A Colourful Hell,"Suddenly you're wading through a maelstrom of strange colours, unknown sounds, and eldritch angles. Maybe that mushroom wasn't good for eating…",,7
+,7,The Sky Is Melting,"Looking up at the sky, you find yourself in it - and the clouds are melting into a technicolour drizzle upon the forests and fields below.",,8|9
+,8,An Awful Headache,"Soon you find yourself stumbling back towards reality and ground level - all while your head is pounding, brains threatening to leak out your eye sockets.",,9|11
+,9,All Coming into Focus,"…is that a huge boulder? That also looks like a rock, and that one too, and so does that one… Urgh, head is hurty and your throat is sore…",,5|12
+,10,Mountain Shack,"You are by a wooden shack. Its makeshift foundation is spackled with compressed dirt and cobblestone, while its exterior is made from weathered spruce.",11,
+,11,Inside the Shack,"You are inside a cramped shack. The floor is a mix of planks, dirt and thatch, while a smouldering fire pit rests in the centre of the room.",,
+,12,Edge of a Forest,"Saplings, shrubbery, and underbrush mark the beginnings of a forest - leaf litter scrunches underfoot and forest critters scurry about.",13,
+,13,Spruce Forest,"Thick spruce trees stretch up into the sky, stretching dozens of meters into the air. The breeze rushes through here as birds sing.",14,
+,14,A Clearing,"You find the remains of a campsite in a clearing, a burnt out campfire, flattened grass, and a broken knife are left behind.",15,
+,15,Dark Forest,"The trees come closer and closer, blotting out sunlight and darkening the horizon - trees cloistered. You don't think you can progress further without a light.",,6

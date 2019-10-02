@@ -1,0 +1,21 @@
+meta,id,name,desc,exits_r,exits_s
+Outward Spiral,0,Centre of the Spiral,"The vantablack core of the spiral, where light cannot reflect at all.",1,
+SPIRAL,1,Circling the Centre,The edges of vision turn dark as the spiral reaches its nadir.,2|12,
+Few diversions are present as fighters roil up and down this cosmic battlefield.,2,Lagrange Point,The pull of the spiral could be too much - but could you go flying elsewhere?,3|14,
+20,3,Interstellar,Things are moving so quickly light bends too - what you see isn't where it is.,4,
+8,4,Spaggetified,To be grabbed and threaded through a needle with incredible force.,5,
+20,5,Accretion Disk,"A spiral of ice, rock, and dust hoping one day to form a mass.",,0
+,6,Outside Time,It all seems to circle back to the beginning here.,7,0
+,7,Aurora Borealis,,8,
+,8,Hayashi Track,,9,0
+,9,Black Dwarf,,10,
+,10,Deuterium Burner,,11,0
+,11,Cosmic Latte,"The average colour of the universe is a light, coffee-like beige.",12,
+,12,A Crack In Time,,13,0
+,13,Solar Winds,,14,
+,14,A Rift in Space,,15,0
+,15,Lithium Burner,,16,
+,16,White Dwarf,,17,0
+,17,Heyney Track,,18,
+,18,Aurora Australis,,19,
+,19,Beyond Time,"It all circles back to the beginning here, it seems.",,0

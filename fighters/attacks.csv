@@ -1,0 +1,73 @@
+id,fid,name,atkstat,defstat,tohit,dice_sides,dice_num,dice_mod,killstring
+0,0,Salami Club,atk,def,2,4,4,2,was walloped with
+1,0,Raaaaaage!,atk,def,-2,6,4,2,was overrun by
+2,0,Low Blow,atk,agi,1,6,3,0,got punted in the shorts by
+3,1,Long Sword,atk,def,0,8,3,3,was cut up with
+4,1,Short Sword,atk,def,2,6,3,3,was stabbed with
+5,1,Brain Blast,mag,mdf,-4,6,5,0,got brain blasted by
+6,2,Staff,atk,def,0,6,2,0,was whacked with
+7,2,Fire Bolt,mag,mdf,3,10,3,0,was scorched by
+8,2,The Wiggles,mag,spd,-2,8,4,4,couldn't stop wiggling to
+9,3,Pointy Stick,atk,def,1,6,2,2,was poked by
+10,3,Chaos Bolt,mag,mdf,0,12,3,-3,felt hundreds of different pains with
+11,3,Explosions?,mag,agi,-1,6,5,0,was blown to pieces by
+12,4,Shank,atk,def,2,6,3,0,was shanked by
+13,4,Fast One,spd,agi,-2,8,3,3,had a fast one pulled on them by
+14,4,Smoke Bomb,agi,spd,-2,12,2,0,was smoked out and choked on
+15,5,Greatsword,atk,def,-1,6,4,2,was cloft in twain by
+16,5,Parry and Riposte,def,atk,-2,8,2,0,got parried and countered by
+17,5,Flying Cleaver,atk,agi,-4,10,3,3,got axed a question with
+18,6,Thrust,atk,def,2,6,3,0,was stabbed in the guts with
+19,6,Sudden Lunge,agi,spd,1,6,3,0,got chopped in the throat with
+20,6,Magic Arrow,mag,mdf,0,6,3,0,was perforated by
+21,7,Big Stick Legislation,atk,def,-1,6,2,0,was verbally whacked over the head with
+22,7,Agile and Innovative,agi,spd,-2,8,3,0,was twisted into a knot over
+23,7,Economic Magic Trick,mag,mdf,-4,12,4,0,was bamboozled and taken in by
+24,8,Dastardly Dirk,atk,def,1,8,3,0,got eviscerated with
+25,8,Bastard Boomerang,agi,spd,-1,6,6,-1,got whacked with
+26,8,Psychic Punch,mag,mdf,-2,4,8,-2,was knocked into next week by
+27,9,Shield Bash,atk,def,1,6,3,2,was clocked in the jaw by
+28,9,Glacial Strike,atk,spd,-1,8,2,4,was too slow to avoid
+29,9,Radiant Smash,atk,mdf,-2,10,3,0,got blasted in radiance by
+30,10,Slice and Dice,atk,def,2,6,3,2,got cut into ribbons by
+31,10,Shuriken,agi,spd,-1,8,2,4,was punctured with
+32,10,Flash Step,spd,agi,-2,10,4,-3,was caught unaware by
+33,11,Razor Sword,atk,def,2,6,3,3,was filleted by
+34,11,Chase Down,atk,spd,0,8,3,1,got chased down by
+35,11,Rejoinder,mag,mdf,-2,10,4,-3,was too dull to avoid
+36,12,Laser Pistol,atk,agi,2,6,2,2,was lasered apart by
+37,12,Truncheon,atk,def,-1,8,3,2,had their head caved in with
+38,12,Shock Bomb,agi,spd,-3,10,4,5,is dancing the electric boogaloo with
+39,13,Ray Gun,atk,agi,1,4,4,3,was raygunned down by
+40,13,Lightshow,agi,spd,-1,6,3,0,felt their retinas burn out watching
+41,13,Magnetic Bomb,mag,mdf,-2,8,4,0,got magnetised with
+42,14,Birdshot,atk,def,0,4,8,0,was shotgunned by
+43,14,Boomstick,atk,agi,-2,6,6,-1,was blasted in half with
+44,14,Flash Bang,agi,mdf,-4,10,4,-3,was conked out with
+45,15,Shiny Finger,mag,mdf,1,6,3,0,was enlightened by
+46,15,Probe,atk,mdf,1,8,4,-3,was probed using
+47,15,Alien Abduction,agi,def,-3,10,4,0,got abducted by
+48,16,Bee Stinger,atk,def,1,4,5,2,got stung by
+49,16,Cup of Bees,agi,spd,-1,8,4,0,had bees poured on them by
+50,16,Stinging Cloud,mag,agi,-2,12,3,3,was turned into a pincushion by
+51,17,Axe Strike,atk,def,2,6,4,2,got the chop from
+52,17,Battle Cry,atk,mdf,0,4,6,1,was scared to death by
+53,17,Rip and Tear,atk,spd,-4,10,5,5,got caught and torn asunder by
+54,18,Claw,atk,def,2,6,3,3,was scratched out by
+55,18,Headbutt,atk,def,0,10,2,5,got a real kisser from
+56,18,Molly-Tov,agi,agi,-2,8,6,-5,got burnt to a crisp by
+57,19,Blunt Force,atk,def,2,8,4,2,has a nasty headache after getting
+58,19,Torsion Lock,agi,def,0,6,6,3,was grabbed and bent into a shape by
+59,19,Extreme Bludgeoning,atk,def,-4,4,6,-1,was smashed into a pancake by
+60,20,Strong Slap,atk,def,2,8,3,1,was chopped across the throat by
+61,20,Catch and Counter,def,atk,0,6,4,3,had their attack caught and countered by
+62,20,Asuka-Lock,agi,def,-3,10,5,5,was held down and stretched out by
+63,21,Wavy Kris,atk,def,1,4,4,0,had a pattern carved into them by
+64,21,Shadow Ball,mag,agi,0,4,6,-5,saw nothing but darkness with
+65,21,Danse Macabre,mag,mdf,-4,4,8,-7,was caught up in
+66,22,Elbow,atk,def,2,8,3,0,had their nose broken with
+67,22,Knee To Face,atk,agi,0,8,5,2,took it in the face from
+68,22,Disarm-Her!,agi,spd,-4,10,4,6,got dis-armed by
+69,23,Leaping Kick,atk,agi,1,6,4,2,was kicked out of the game by
+70,23,Slide Tackle,atk,spd,0,4,8,0,got upended by
+71,23,Rocket Ride,mag,mdf,-2,8,6,2,got sent to the moon with
