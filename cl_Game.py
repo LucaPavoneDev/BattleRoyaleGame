@@ -83,7 +83,7 @@ class GameSystem(object):
             # Dividable by 3. Can do trios.
             choices.append("TRIPLES BATTLE")
             shorts.append("TRIS")
-        if(fCount % 4 == 0):
+        if(fCount % 4 == 0 and fCount != 4):
             # Dividable by 4. Go for quads.
             choices.append("QUARTETS BATTLE")
             shorts.append("QUADS")
