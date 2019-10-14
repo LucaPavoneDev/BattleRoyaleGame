@@ -230,6 +230,7 @@ class Hazard(object):
                 else:
                     if(target.think(target.ai_talk) == True):
                         target.sayDoSomething(choice(target.loseStrings))
+                    target.deaths += 1
                     self.kills.append(target.name)
         else:
             pass

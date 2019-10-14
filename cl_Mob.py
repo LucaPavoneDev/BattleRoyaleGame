@@ -13,6 +13,7 @@ class Mob(object):
                  mobHP=50):
         self.id                = newID
         self.alive             = True
+        self.deaths            = 0
         self.name              = mobName
         self.sname             = ""
         self.type              = mobType
@@ -418,6 +419,7 @@ class Mob(object):
                                     target.hpPerRound.append(target.hitpoints)
                                     if(target.think(target.ai_talk) == True):
                                         target.sayDoSomething(choice(target.loseStrings))
+                                    target.deaths += 1
                         else:
                             # Attack misses!
                             print(self.name+"'s "+atk.name+" misses "+target.name+"! ("+str(attackRoll)+" vs "+str(defendRoll)+")")
@@ -650,7 +652,6 @@ class Mob(object):
                 print(self.name+" got a Teleport Sphere! (Teleports to random location)")
                 from cl_Room import Room
                 from cl_Room import roomList
-                from random import randint
                 roomToPick = randint(0,len(roomList)-1)
                 newRoom = roomList[roomToPick]
                 self.placeInRoom(newRoom)
@@ -677,6 +678,61 @@ class Mob(object):
                 pickup.remove()
         else:
             pass
+    
+    def reInitialise(self):
+        # Resets a character back to their initial game state,
+        # and wipes their statistics clean during the process.
+        # Does the same for their attacks and statistics.
+        
+        #Statistics
+        self.alive             = True
+        self.hitpoints         = self.maxHitpoints
+        self.hpPerRound        = []
+        self.buffTimer         = 0
+        self.buffType          = None
+        self.itemsGot          = []
+        self.cheatedDeath      = 0
+        self.hazardsTripped    = 0
+        self.hazardsAvoided    = 0
+        self.healingGot        = 0
+
+        #Attacks
+        self.currentTarget     = None
+        self.lastAttacked      = None
+        self.lastHitBy         = None
+        self.lastHitWith       = None
+        self.lastMissedBy      = None
+
+        #Movement and Travel
+        self.location          = None
+        self.travel            = []
+        self.travelFight       = []
+        self.travelAttacked    = []
+        self.travelSteps       = 0
+        
+        for at in self.attacks:
+            at.hits = 0
+            at.misses = 0
+            at.damage = 0
+            at.targets = dict()
+            at.targetHits = dict()
+            at.targetMisses = dict()
+            at.targetDamage = dict()
+            at.kills = []
+
+    def respawn(self):
+        # Respawns a character who's died, but doesn't wipe their stats.
+        # or count towards the cheated death metric.
+        # Also places them in a random room to get started again.
+        if(self.alive == False):
+            self.alive             = True
+            self.hitpoints         = self.maxHitpoints
+            self.buffTimer         = 0
+            self.buffType          = None
+            
+            roomToPick = randint(0,len(roomList)-1)
+            newRoom = roomList[roomToPick]
+            self.placeInRoom(newRoom,False)
 
 # Attacks Class
 class Attack(object):
