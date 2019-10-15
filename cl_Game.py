@@ -302,6 +302,7 @@ class GameSystem(object):
                 if(f not in self.deadList):
                     f.reportStatus()
                     print(self.smallSep)
+                    sleep(0.75)
 
     def showItems(self):
         if(len(itemList)):
