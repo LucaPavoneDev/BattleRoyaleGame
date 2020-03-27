@@ -1,5 +1,7 @@
 import cl_Game
 
+CONFIG_print = False
+
 #Create room class
 class Room(object):
     def __init__(self,roomID=-1,name="Blank",desc="Blank Description."):
@@ -10,7 +12,7 @@ class Room(object):
         self.mobs = []
         self.items = []
         self.hazards = []
-        print("New room \""+str(self.name)+"\" was created.");
+        if(CONFIG_print): print("New room \""+str(self.name)+"\" was created.");
 
         # Statistics and Logging
         self.travelledTo = dict()
@@ -54,17 +56,17 @@ class Room(object):
         if(isinstance(newName,str)):
             prevName = self.name
             self.name = newName
-            print(prevName+" is now called "+newName)
+            if(CONFIG_print): print(prevName+" is now called "+newName)
         else:
-            print("New name for "+self.name+" is not a string.")
+            if(CONFIG_print): print("New name for "+self.name+" is not a string.")
 
     #Update room description
     def updateDescription(self,newDescription = None):
         if(isinstance(newDescription,str)):
             self.desc = newDescription
-            print("Description for "+self.name+" successfully updated.")
+            if(CONFIG_print): print("Description for "+self.name+" successfully updated.")
         else:
-            print("New description for "+self.name+" is not a string.")
+            if(CONFIG_print): print("New description for "+self.name+" is not a string.")
 
     #Add Exit
     def addExit(self,newRoom,oneWay = True):
@@ -72,23 +74,23 @@ class Room(object):
         if(isinstance(newRoom,Room)):
             #New exit can be created.
             self.exits.append(newRoom.id)
-            print("New exit toward "+newRoom.name+" was added to "+self.name+".")
+            if(CONFIG_print): print("New exit toward "+newRoom.name+" was added to "+self.name+".")
 
             #Add reciprocal exit if second argument is a true bool.
             if(isinstance(oneWay,bool)):
                 if(oneWay == True):
                     #Add exit from new location to this one.
                     newRoom.exits.append(self.id)
-                    print("New exit toward "+self.name+" was added to "+newRoom.name+" reciprocally.")
+                    if(CONFIG_print): print("New exit toward "+self.name+" was added to "+newRoom.name+" reciprocally.")
         else:
             #New exit cannot be created.
-            print("Room \""+str(newRoom)+"\"does not exist or is not a location.")
+            if(CONFIG_print): print("Room \""+str(newRoom)+"\"does not exist or is not a location.")
 
         #Report new number of exits.
-        print(self.name+" has "+str(len(self.exits))+" exit(s) now.")
+        if(CONFIG_print): print(self.name+" has "+str(len(self.exits))+" exit(s) now.")
         if(isinstance(oneWay,bool)):
             if(oneWay == True):
-                print(newRoom.name+" has "+str(len(newRoom.exits))+" exit(s) now.")
+                if(CONFIG_print): print(newRoom.name+" has "+str(len(newRoom.exits))+" exit(s) now.")
 
     #Remove Exit
     def removeExit(self,removeRoom,oneWay):
@@ -99,25 +101,25 @@ class Room(object):
                 #remove all exits to specified location.
                 while(removeRoom.id in self.exits):
                     self.exits.remove(removeRoom.id)
-                    print("Exit to "+str(removeRoom.name)+" has been removed.")
+                    if(CONFIG_print): print("Exit to "+str(removeRoom.name)+" has been removed.")
 
                 #Reciprocally remove exit there
                 if(isinstance(oneWay,bool)):
                     if(oneWay == True):
                         while(self.id in removeRoom.exits):
                             removeRoom.exits.remove(self.id)
-                            print("Exit to "+str(self.name)+" has been removed reciprocally.")
+                            if(CONFIG_print): print("Exit to "+str(self.name)+" has been removed reciprocally.")
             else:
                 #Room does not exist in list.
-                print(str(removeRoom.name)+" does not have an exit associated with "+self.name+".")
+                if(CONFIG_print): print(str(removeRoom.name)+" does not have an exit associated with "+self.name+".")
         else:
-            print("Room \""+str(removeRoom)+"\" does not exist or is not a location.")
+            if(CONFIG_print): print("Room \""+str(removeRoom)+"\" does not exist or is not a location.")
 
         #Report new number of exits.
-        print(self.name+" has "+str(len(self.exits))+" exit(s) now.")
+        if(CONFIG_print): print(self.name+" has "+str(len(self.exits))+" exit(s) now.")
         if(isinstance(oneWay,bool)):
             if(oneWay == True):
-                print(newRoom.name+" has "+str(len(newRoom.exits))+" exit(s) now.")
+                if(CONFIG_print): print(newRoom.name+" has "+str(len(newRoom.exits))+" exit(s) now.")
 
     # Get Exits
     def getExits(self):
@@ -230,7 +232,6 @@ class Hazard(object):
                 else:
                     if(target.think(target.ai_talk) == True):
                         target.sayDoSomething(choice(target.loseStrings))
-                    target.deaths += 1
                     self.kills.append(target.name)
         else:
             pass

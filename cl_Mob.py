@@ -3,6 +3,9 @@ from random import randint
 from random import choice
 from random import shuffle
 
+# import CSV and folder stuff
+import csv
+
 # Mob Class
 class Mob(object):
     def __init__(self,
@@ -61,6 +64,8 @@ class Mob(object):
         self.healStrings       = [] # Triggered upon health recovery.
         self.hazardStrings     = [] # Triggered upon tripping a hazard.
         self.waitStrings       = [] # Triggered upon wait.
+        self.threeKillStrings  = [] # Triggered after getting 3 kills.
+        self.fiveKillStrings   = [] # Triggered after getting 5 kills.
         
         # Intelligence/Decision Making
         self.ai_memory         = 3  # How many turns of Memories the Mob retains with which to make decisions.
@@ -76,12 +81,12 @@ class Mob(object):
     def __repr__(self):
         if(self.alive):
             if(self.team != None):
-                return self.name+" ("+str(self.team.name)+")"
+                return self.name+" ["+str(self.team.name)+"]"
             else:
                 return self.name
         else:
             if(self.team != None):
-                return self.name+" ("+str(self.team.name)+") (DEAD)"
+                return self.name+" ["+str(self.team.name)+"] (DEAD)"
             else:
                 return self.name+" (DEAD)"
     
@@ -96,7 +101,7 @@ class Mob(object):
     def retype(self,newType):
         prevType = self.type
         self.type = newType
-        print(self.name+" is now a "+self.type)
+        print(self.name+" was a "+prevType+", and is now a "+self.type)
 
     # Change team
     def changeTeam(self,newTeam):
@@ -139,7 +144,7 @@ class Mob(object):
             print(self.name+" is dead. "+str(self.hitpoints)+"/"+str(self.maxHitpoints)+" hitpoints.")
         return self.hitpoints
 
-    # Add Attack
+    # Add Attack by creating it dynamically.
     def addAttack(self,aid=-1,params=["Blank Attack","ATK","DEF",0,6,3,0],killString="was killed by",report=False):
         # [name,satk,sdef,dds,ddn,ddm]
         newAttack = Attack()
@@ -154,6 +159,15 @@ class Mob(object):
         newAttack.killString = killString
 
         self.attacks.append(newAttack)
+        if(report):
+            print(self.name+" is now armed with "+newAttack.name+" (+"+str(newAttack.toHit)+
+                  " To Hit, "+str(newAttack.damDiceNumber)+"d"+str(newAttack.damDiceSides)+
+                  "+"+str(newAttack.damDiceMod)+" Damage)")
+    
+    # Add Attack Object as a whole.
+    def addAttackObject(self,newAttack,report=False):
+        self.attacks.append(newAttack)
+        
         if(report):
             print(self.name+" is now armed with "+newAttack.name+" (+"+str(newAttack.toHit)+
                   " To Hit, "+str(newAttack.damDiceNumber)+"d"+str(newAttack.damDiceSides)+
@@ -324,10 +338,12 @@ class Mob(object):
     def reportStatus(self,loc=True):
         if(self.alive == True):
             # Return current HP
-            print(self.name+" Health: "+str(self.hitpoints)+"/"+str(self.maxHitpoints))
             # Report Team Name if available.
             if(self.team != None):
-                print("Team: "+str(self.team.name))
+                print(self.name+" Health: "+str(self.hitpoints)+"/"+str(self.maxHitpoints))
+            else: 
+                print(self.name+" Health: "+str(self.hitpoints)+"/"+str(self.maxHitpoints)+" ["+str(self.team.name)+"]")
+            
             # Report Buffs if active.
             if(self.buffTimer > 0 and self.buffType != None):
                 print("Buff: "+str(self.buffType)+" | Duration: "+str(self.buffTimer)+" Rounds")
@@ -419,7 +435,6 @@ class Mob(object):
                                     target.hpPerRound.append(target.hitpoints)
                                     if(target.think(target.ai_talk) == True):
                                         target.sayDoSomething(choice(target.loseStrings))
-                                    target.deaths += 1
                         else:
                             # Attack misses!
                             print(self.name+"'s "+atk.name+" misses "+target.name+"! ("+str(attackRoll)+" vs "+str(defendRoll)+")")
@@ -650,8 +665,8 @@ class Mob(object):
             elif(isinstance(pickup,it.teleportPickup)):
                 # Teleport Sphere!
                 print(self.name+" got a Teleport Sphere! (Teleports to random location)")
-                from cl_Room import Room
                 from cl_Room import roomList
+                from random import randint
                 roomToPick = randint(0,len(roomList)-1)
                 newRoom = roomList[roomToPick]
                 self.placeInRoom(newRoom)
@@ -679,60 +694,71 @@ class Mob(object):
         else:
             pass
     
-    def reInitialise(self):
-        # Resets a character back to their initial game state,
-        # and wipes their statistics clean during the process.
-        # Does the same for their attacks and statistics.
+    def specifyChatStrings(self,chatLists):
+        self.winStrings        = chatLists[0].split("|")
+        self.readyStrings      = chatLists[1].split("|")
+        self.loseStrings       = chatLists[2].split("|")
+        self.attackStrings     = chatLists[3].split("|")
+        self.hurtStrings       = chatLists[4].split("|")
+        self.insultStrings     = chatLists[5].split("|")
+        self.complimentStrings = chatLists[6].split("|")
+        self.moveStrings       = chatLists[7].split("|")
+        self.healStrings       = chatLists[8].split("|")
+        self.hazardStrings     = chatLists[9].split("|")
+        self.waitStrings       = chatLists[10].split("|")
+    
+    @classmethod
+    def createMobs(self,mob_file="\\fighters\\fighters.csv"):
+        mobList = []
         
-        #Statistics
-        self.alive             = True
-        self.hitpoints         = self.maxHitpoints
-        self.hpPerRound        = []
-        self.buffTimer         = 0
-        self.buffType          = None
-        self.itemsGot          = []
-        self.cheatedDeath      = 0
-        self.hazardsTripped    = 0
-        self.hazardsAvoided    = 0
-        self.healingGot        = 0
-
-        #Attacks
-        self.currentTarget     = None
-        self.lastAttacked      = None
-        self.lastHitBy         = None
-        self.lastHitWith       = None
-        self.lastMissedBy      = None
-
-        #Movement and Travel
-        self.location          = None
-        self.travel            = []
-        self.travelFight       = []
-        self.travelAttacked    = []
-        self.travelSteps       = 0
+        # Import via CSV
+        with open(mob_file,newline="") as ff:
+            mobRead = csv.DictReader(ff)
         
-        for at in self.attacks:
-            at.hits = 0
-            at.misses = 0
-            at.damage = 0
-            at.targets = dict()
-            at.targetHits = dict()
-            at.targetMisses = dict()
-            at.targetDamage = dict()
-            at.kills = []
-
-    def respawn(self):
-        # Respawns a character who's died, but doesn't wipe their stats.
-        # or count towards the cheated death metric.
-        # Also places them in a random room to get started again.
-        if(self.alive == False):
-            self.alive             = True
-            self.hitpoints         = self.maxHitpoints
-            self.buffTimer         = 0
-            self.buffType          = None
-            
-            roomToPick = randint(0,len(roomList)-1)
-            newRoom = roomList[roomToPick]
-            self.placeInRoom(newRoom,False)
+            for r in mobRead:
+                ini = (int(r["id"]),
+                       str(r["name"]),
+                       str(r["type"]),
+                       str(r["desc"]),
+                       int(r["hp"])
+                      )
+                stat = {"ATK":int(r["atk"]),"DEF":int(r["def"]),
+                        "AGI":int(r["agi"]),"SPD":int(r["spd"]),
+                        "MAG":int(r["mag"]),"MDF":int(r["mdf"])
+                        }
+                # Init Mob Vitals and Stats
+                newMob = Mob(ini[0],ini[1],ini[2],ini[3],ini[4])
+                newMob.stats = stat
+                
+                # Short Name
+                newMob.sname = str(r["sname"])
+                
+                # Get Chat Strings
+                chat_win    = str(r["winstrings"])
+                chat_ready  = str(r["readystrings"])
+                chat_lose   = str(r["losestrings"])
+                chat_attack = str(r["attackstrings"])
+                chat_hurt   = str(r["hurtstrings"])
+                chat_insult = str(r["insultstrings"])
+                chat_comp   = str(r["complimentstrings"])
+                chat_move   = str(r["movestrings"])
+                chat_heal   = str(r["healstrings"])
+                chat_hazard = str(r["hazardstrings"])
+                chat_wait   = str(r["waitstrings"])
+                
+                chatList = [chat_win,chat_ready,chat_lose,chat_attack,chat_hurt,chat_insult,
+                            chat_comp,chat_move,chat_heal,chat_hazard,chat_wait]
+                
+                newMob.specifyChatStrings(chatList)
+                
+                ai_talk     = int(r["ai_talk"])
+                
+                newMob.ai_talk = ai_talk
+                
+                mobList.append(newMob)
+        
+        ff.close()
+        return mobList
 
 # Attacks Class
 class Attack(object):
@@ -756,16 +782,63 @@ class Attack(object):
         self.targetMisses = dict()
         self.targetDamage = dict()
         self.kills = []
-
-        attackList.append(self)
     
     def __repr__(self):
         return self.name
     
+    def setID(self,newID):
+        if(isinstance(newID,int)):
+            self.id = newID
+    
     def rename(self,newName):
-        oldName = self.name
-        self.name = newName
-        print("Attack "+oldName+" is now "+self.name)
+        if(isinstance(newName,str)):
+            self.name = newName
+    
+    def setAttackDefend(self,newATK="ATK",newDEF="DEF"):
+        self.statAttack = newATK.upper()
+        self.statDefend = newDEF.upper()
+        
+    def setDiceProperties(self,toHit=0,sides=8,num=3,mod=0):
+        self.toHit         = toHit
+        self.damDiceSides  = sides
+        self.damDiceNumber = num
+        self.damDiceMod    = mod
+    
+    def setKillString(self,kString="was ouched by"):
+        self.killString    = kString
+        pass
+        
+    @classmethod
+    def createAndAssignAttacks(self,attack_file=""):
+        # Returns a list of attacks, and assigns them to characters
+        result = []
+        with open(attack_file, "r") as af:
+            attackRead = csv.DictReader(af)
+        
+            for r in attackRead:
+                attackID    = int(r["id"])
+                fighterID   = int(r["fid"])
+                name        = str(r["name"])
+                aStat       = str(r["atkstat"]).upper()
+                dStat       = str(r["defstat"]).upper()
+                toHit       = int(r["tohit"])
+                diceSides   = int(r["dice_sides"])
+                diceNum     = int(r["dice_num"])
+                diceMod     = int(r["dice_mod"])
+                kString     = str(r["killstring"])
+                
+                newAttack       = Attack()
+                newAttack.setID(attackID)
+                newAttack.rename(name)
+                newAttack.setAttackDefend(aStat,dStat)
+                newAttack.setDiceProperties(toHit,diceSides,diceNum,diceMod)
+                newAttack.setKillString(kString)
+                
+                mobList[fighterID].addAttackObject(newAttack)
+            
+                result.append(newAttack)
+        
+        return result
 
 # Team Class
 class Team(object):
@@ -836,7 +909,6 @@ class Team(object):
         if(isinstance(newMember,Mob)):
             if(newMember not in self.members):
                 self.members.append(newMember)
-                ind = self.members.index(newMember)
                 newMember.team = self
                 print(newMember.name+" was added to team "+self.name+".")
             else:
@@ -845,9 +917,8 @@ class Team(object):
             print("Specified object is not a Mob.")
 
     def remMember(self,oldMember):
-        if(isinstance(newMember,Mob)):
+        if(isinstance(oldMember,Mob)):
             if(oldMember in self.members):
-                ind = self.members.index(oldMember)
                 self.members.remove(oldMember)
                 oldMember.team = None
                 print(oldMember.name+" is no longer part of "+self.team++" Team.")
@@ -869,6 +940,17 @@ class Team(object):
             return members_alive
         else:
             return members_alive+members_dead
+    
+    @classmethod
+    def createTeams(self,teams_file="./fighters/teams.csv"):
+        result = []
+        with open(teams_file, "r") as tf:
+            teamRead = csv.DictReader(tf)
+            for r in teamRead:
+                tn = str(r["name"])
+                newTeam = Team(tn)
+                result.append(newTeam)
+        return result
 
 # Memory Class (tbd)
 class MobMemory():
@@ -885,96 +967,16 @@ class Player(Mob):
         pass
 
 # Lists
-mobList = []
-attackList = []
-teamList = []
-
-# import CSV and folder stuff
-import csv
-import os
+fighterFile = "./fighters/fighters.csv"
+attackFile  = "./fighters/attacks.csv"
+teamsFile   = "./fighters/teams.csv"
 
 input("*** Introducing the fighters! (Hit [ENTER]) ***")
 
-csvDir = os.getcwd()
-fighterFile = csvDir+"\\fighters\\fighters.csv"
-attackFile = csvDir+"\\fighters\\attacks.csv"
-teamsFile = csvDir+"\\fighters\\teams.csv"
-
-# Mob Import
-with open(fighterFile, newline="") as fFile:
-    fighterReader = csv.DictReader(fFile)
-    for row in fighterReader:
-        f_id    = int(row["id"])
-        f_name  = str(row["name"])
-        f_type  = str(row["type"])
-        f_desc  = str(row["desc"])
-        f_hp    = int(row["hp"])
-        f_stats = {"ATK":int(row["atk"]),"DEF":int(row["def"]),
-                   "AGI":int(row["agi"]),"SPD":int(row["spd"]),
-                   "MAG":int(row["mag"]),"MDF":int(row["mdf"])}
-        newFighter = Mob(f_id,f_name,f_type,f_desc,f_hp)
-        newFighter.stats = f_stats
-        
-        # Short Name
-        sname = str(row["sname"])
-        newFighter.sname = sname
-        
-        # Chatter
-        chat_wins  = str(row["winstrings"])
-        newFighter.winStrings        = chat_wins.split("|")
-        chat_ready = str(row["readystrings"])
-        newFighter.readyStrings      = chat_ready.split("|")
-        chat_lose = str(row["losestrings"])
-        newFighter.loseStrings       = chat_lose.split("|")
-        chat_attack = str(row["attackstrings"])
-        newFighter.attackStrings     = chat_attack.split("|")
-        chat_hurt = str(row["hurtstrings"])
-        newFighter.hurtStrings       = chat_hurt.split("|")
-        chat_insult = str(row["insultstrings"])
-        newFighter.insultStrings     = chat_insult.split("|")
-        chat_comp = str(row["complimentstrings"])
-        newFighter.complimentStrings = chat_comp.split("|")
-        chat_move = str(row["movestrings"])
-        newFighter.moveStrings       = chat_move.split("|")
-        chat_wait = str(row["waitstrings"])
-        newFighter.waitStrings       = chat_wait.split("|")
-        chat_heal = str(row["healstrings"])
-        newFighter.healStrings       = chat_heal.split("|")
-        chat_hazard = str(row["hazardstrings"])
-        newFighter.hazardStrings     = chat_hazard.split("|")
-        
-        # AI Parameters
-        ai_talk = int(row["ai_talk"])
-        newFighter.ai_talk           = ai_talk
-        
-        print("\nIntroducing "+newFighter.name+", "+newFighter.type+"!")
-        print(newFighter.desc)
-        mobList.append(newFighter)
-
-# Attack Import and Append
-with open(attackFile, newline="") as aFile:
-    attackReader = csv.DictReader(aFile)
-    for row in attackReader:
-        attackID    = int(row["id"])
-        fighterID   = int(row["fid"])
-        name        = str(row["name"])
-        aStat       = str(row["atkstat"]).upper()
-        dStat       = str(row["defstat"]).upper()
-        toHit       = int(row["tohit"])
-        diceSides   = int(row["dice_sides"])
-        diceNum     = int(row["dice_num"])
-        diceMod     = int(row["dice_mod"])
-        kString     = str(row["killstring"])
-
-        mobList[fighterID].addAttack(attackID,[name,aStat,dStat,toHit,diceSides,diceNum,diceMod],kString)
-
-# Team Name Import
-with open(teamsFile, newline="") as tFile:
-    teamReader = csv.DictReader(tFile)
-    for rowT in teamReader:
-        tName = str(rowT["name"])
-        newTeam = Team(tName)
-        teamList.append(newTeam)
+# Use Class Methods to generate characters, attacks and teams
+mobList = Mob.createMobs(fighterFile)
+attackList = Attack.createAndAssignAttacks(attackFile)
+teamList = Team.createTeams(teamsFile)
 
 # Number of Fighters
 fightersChosen = False

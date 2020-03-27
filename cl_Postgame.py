@@ -19,13 +19,6 @@ now = dt.strftime(dt.now(),form)
 # Fighter Metrics
 def fighterMetricsToFile(game):
     if(isinstance(game,GameSystem)):
-        try:
-            # Create directory for logs to live in.
-            os.mkdir("./postgameLogs/")
-        except FileExistsError:
-            # Directory already exists. We're fine.
-            pass
-    
         postgameCSV = os.getcwd()+"\\postgameLogs\\postgame_"+now+"_fighters.csv"
         with open(postgameCSV,"w+") as csvfile:
             fields = ["id","name","type","location","locid","hps","alive",

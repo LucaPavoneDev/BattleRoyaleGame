@@ -15,7 +15,6 @@ def rollDice(sides=6, number=1, mod=0):
 from random import randint
 from random import choice
 from random import shuffle
-from time import sleep
 from cl_Room import roomList
 from cl_Room import hazardList
 from cl_Mob import mobList
@@ -203,7 +202,6 @@ class GameSystem(object):
             self.spawnItem()
             self.powerupDropIn = rollDice(6,self.randomDrops["p"])
         print("New powerup dropping in "+str(self.powerupDropIn)+" turns!")
-        sleep(1.5)
 
     def hazardCountdown(self):
         # Count down existing hazards on field, drop new hazard
@@ -277,7 +275,6 @@ class GameSystem(object):
             if(f not in self.deadList):
                 f.hpPerRound.append(f.hitpoints)
                 print(self.smallSep)
-                sleep(1.5)
 
     def matchStatus(self):
         gm = self.gameMode
@@ -294,7 +291,6 @@ class GameSystem(object):
                     if(f not in self.deadList):
                         f.reportStatus()
                         print(self.smallSep)
-                        sleep(0.75)
                 print(self.smallSep)
         else:
             # No Teams. List fighters individually in ID order.
@@ -302,7 +298,6 @@ class GameSystem(object):
                 if(f not in self.deadList):
                     f.reportStatus()
                     print(self.smallSep)
-                    sleep(0.75)
 
     def showItems(self):
         if(len(itemList)):
