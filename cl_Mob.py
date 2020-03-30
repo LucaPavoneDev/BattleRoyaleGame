@@ -339,7 +339,7 @@ class Mob(object):
         if(self.alive == True):
             # Return current HP
             # Report Team Name if available.
-            if(self.team != None):
+            if(self.team == None):
                 print(self.name+" Health: "+str(self.hitpoints)+"/"+str(self.maxHitpoints))
             else: 
                 print(self.name+" Health: "+str(self.hitpoints)+"/"+str(self.maxHitpoints)+" ["+str(self.team.name)+"]")
@@ -971,51 +971,53 @@ fighterFile = "./fighters/fighters.csv"
 attackFile  = "./fighters/attacks.csv"
 teamsFile   = "./fighters/teams.csv"
 
-input("*** Introducing the fighters! (Hit [ENTER]) ***")
+#input("*** Introducing the fighters! (Hit [ENTER]) ***")
 
 # Use Class Methods to generate characters, attacks and teams
 mobList = Mob.createMobs(fighterFile)
 attackList = Attack.createAndAssignAttacks(attackFile)
 teamList = Team.createTeams(teamsFile)
 
-# Number of Fighters
-fightersChosen = False
-minimum = 4
-maximum = len(mobList)
-question = "How many fighters would you like to join the battle? ("+str(minimum)+" to "+str(maximum)+")\n[Hit ENTER immediately to go for maximum!]\n>"
-while(fightersChosen == False):
-    pick = -1
-    pick = input(question)
-
-    if(pick == ""):
-        # Go for max number.
-        pick = maximum
-    else:
-        try:
-            pick = int(pick)
-        except ValueError:
-            # Not a number.
-            print("That's not a number.")
+def chooseFighters(ml=mobList):
+    # Number of Fighters
+    fightersChosen = False
+    minimum = 4
+    maximum = len(ml)
+    question = "How many fighters would you like to join the battle? ("+str(minimum)+" to "+str(maximum)+")\n[Hit ENTER immediately to go for maximum!]\n>"
+    
+    while(fightersChosen == False):
+        pick = -1
+        pick = input(question)
+    
+        if(pick == ""):
+            # Go for max number.
+            pick = maximum
+        else:
+            try:
+                pick = int(pick)
+            except ValueError:
+                # Not a number.
+                print("That's not a number.")
+                continue
+        
+        if(pick < minimum):
+            # Below minimum.
+            print("That's below the minimum.")
+            continue
+        if(pick > maximum):
+            # Above maximum.
+            print("That's above the maximum.")
             continue
     
-    if(pick < minimum):
-        # Below minimum.
-        print("That's below the minimum.")
-        continue
-    if(pick > maximum):
-        # Above maximum.
-        print("That's above the maximum.")
-        continue
-
-    input("You have selected "+str(pick)+" fighters. (Hit [ENTER])")
-    shuffle(mobList)
-    # Shuffle list, then cut list down to number of choices.
-    mobList = mobList[:pick]
-    # Then sort list back into ID order.
-    mobList.sort(key=lambda Mob: Mob.id)
-    print(mobList)
-    fightersChosen = True
-    for m in mobList:
-        if(m.think(m.ai_talk) == True):
-            m.sayDoSomething(choice(m.readyStrings))
-    input("The fighters are assembled! (Hit [ENTER])")
+        input("You have selected "+str(pick)+" fighters. (Hit [ENTER])")
+        shuffle(ml)
+        # Shuffle list, then cut list down to number of choices.
+        ml = ml[:pick]
+        # Then sort list back into ID order.
+        ml.sort(key=lambda Mob: Mob.id)
+        print(ml)
+        fightersChosen = True
+        for m in ml:
+            if(m.think(m.ai_talk) == True):
+                m.sayDoSomething(choice(m.readyStrings))
+        input("The fighters are assembled! (Hit [ENTER])")

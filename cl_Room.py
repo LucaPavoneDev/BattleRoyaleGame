@@ -1,3 +1,5 @@
+#create CSV function to read/write rooms
+import csv, os
 import cl_Game
 
 CONFIG_print = False
@@ -119,7 +121,7 @@ class Room(object):
         if(CONFIG_print): print(self.name+" has "+str(len(self.exits))+" exit(s) now.")
         if(isinstance(oneWay,bool)):
             if(oneWay == True):
-                if(CONFIG_print): print(newRoom.name+" has "+str(len(newRoom.exits))+" exit(s) now.")
+                if(CONFIG_print): print(removeRoom.name+" has "+str(len(removeRoom.exits))+" exit(s) now.")
 
     # Get Exits
     def getExits(self):
@@ -287,156 +289,161 @@ class Map(object):
         else:
             pass        
 
+####################
+## Lone Functions ##
+####################
+
+def getMapFiles(md):
+    ml = []
+    mapFileList = os.scandir(mapDir)
+
+    if(mapFileList == []):
+        # No files at all in the map directory
+        input("No files found in map directory! Cannot run a game without a map!\nPress [ENTER] to exit!")
+        quit()
+    
+    else:
+        # Read maps, create Map objects.
+        for m in mapFileList:
+            fileType = m.path.split(".")[-1]
+            mi = []     # Map Info goes here, gets read sequentially.
+            if(fileType == "csv"):
+                # Double checked that its a CSV file being read...
+                print("Found CSV File '"+m.name+"'. Adding to Maps...")
+                with open(m, newline="") as mapFile:
+                    # Open file, get dictionary reader.
+                    mapReader = csv.DictReader(mapFile)
+                    for r in mapReader:
+                        # Check that the 'meta' row isn't empty.
+                        if(r["meta"] != "" and r["meta"] != None):
+                            # Add meta info to local map info list.
+                            mi.append(r["meta"])
+    
+                    # Create new map object, write meta info into it
+                    newMap = Map(mi[0],mi[1],mi[2],mi[3],mi[4],mi[5])
+                    # Get filepath for map, then append to Maps List.
+                    newMap.updatePath(m.path)
+                    ml.append(newMap)
+            else:
+                # Different file to a csv being read. Skip it.
+                print("Found a non CSV file '"+m.name+"' in map directory. Skipping...")
+                continue
+
+    # No map files loaded
+    if(ml == []):
+        input("No maps found! Cannot run a game without a map!\nPress [ENTER] to exit!")
+        quit()
+    else:
+        return ml
+
+def mapSelection():
+    # Create namelists for maps for map selection screen.
+    mapNames    = []
+    shortNames  = []
+    mapToPick = None
+    confirmed = None
+    for m in mapList:
+        mapNames.append(m.name)
+        shortNames.append(m.sname)
+    
+    mapInfo = "Pick a Map by typing its short name.\nExample: "+shortNames[0]+" = "+mapNames[0]
+    print(mapInfo)
+    print(mapNames)
+    print(shortNames)
+    
+    while(mapToPick == None):
+        
+        i = input(">")
+        preInput = i.upper()
+        
+        if(preInput in shortNames):
+            # Player entered a valid map name.
+            mapIndex = shortNames.index(preInput)
+    
+            if(isinstance(mapList[mapIndex],Map)):
+                mapToPick = mapList[mapIndex]
+                print("You have chosen \'"+mapToPick.name+"\'.")
+                print(mapToPick.desc)
+                print("Rooms: "+str(mapToPick.rCount)+" | Min Fighters: "+str(mapToPick.minFig)+" | Max Fighters: "+str(mapToPick.maxFig))
+                print("Would you like to fight on this map? (Y/N)")
+                
+                # Give additional map info, let player decide if its for them.
+                while(confirmed == None):
+                    pick = input(">")
+                    if(pick.upper() == "Y"):
+                        confirmed = True
+                    elif(pick.upper() == "N"):
+                        confirmed = False
+                    else:
+                        print("Please enter Y or N.")
+                if(confirmed == True):
+                    print("Map \'"+mapList[mapIndex].name+"\' selected!")
+                    input("Press [ENTER] To Proceed!")
+                else:
+                    # While loop continues.
+                    # Reset important loop deciders.
+                    mapToPick = None
+                    confirmed = None
+    
+                    print(mapInfo)
+                    print(mapNames)
+                    print(shortNames)
+            else:
+                print("Somehow, a non-map is in the map list. C'mon now...")
+                quit()
+            
+            # Old code.
+            #mapName = preInput[:-4]
+            #print("Map \'"+mapName+"\' selected!")
+            #input("Press [ENTER] To Proceed!")
+            #mapToPick = preInput
+        else:
+            print("Not a valid Map!")
+
+    roomCSV = mapToPick.path
+
+    with open(roomCSV, newline="") as csvfile:
+        #CSV Function to read rooms from a file
+        print("CSV Room import function, starting on Static elements...")
+    
+        #pass through first time to populate static elements of rooms and add the rooms to roomlist
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            newRoom = Room(int(row["id"]),row["name"],row["desc"])
+            roomList.append(newRoom)
+            #print("New room id: "+str(newRoom.id)+" appended to room list.")
+        print(roomList)
+        print("CSV Room import function, static elements finishing...")
+    
+    with open(roomCSV, newline="") as csvfile:
+        #pass through a second time to add dynamic elements (mobs, objects, exits...)
+        #(it would freak out if I did this before, as it would look for things that won't exist yet)
+        print("CSV Room import function, starting on Dynamic elements...")
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            RoomID = int(row["id"])
+            updateRoom = roomList[RoomID]
+    
+            #Adding Reciprocal Exits
+            if(row["exits_r"] != ""):
+                exits = row["exits_r"]
+                exitsList = exits.split("|")
+                for newExit in exitsList:
+                    updateRoom.addExit(roomList[int(newExit)],True)
+    
+            #adding One-Way exits.
+            if(row["exits_s"] != ""):
+                exits = row["exits_s"]
+                exitsList = exits.split("|")
+                for newExit in exitsList:
+                    updateRoom.addExit(roomList[int(newExit)],False)
+        
+        print("CSV Room import function, dynamic elements finishing...")
+
 #Add starting locations and exits
 #Create indexed list for rooms to live in and reference from
-roomList = list()
-hazardList = list()
-mapList = list()
+mapDir = "./maps"
 
-#create CSV function to read/write rooms
-import csv
-import os
-
-mapDir = os.getcwd()+"\\maps\\"
-mapFileList = os.scandir(mapDir)
-
-if(mapFileList == []):
-    # No files at all in the map directory
-    input("No files found in map directory! Cannot run a game without a map!\nPress [ENTER] to exit!")
-    quit()
-else:
-    # Read maps, create Map objects.
-    for m in mapFileList:
-        fileType = m.path.split(".")[-1]
-        mi = []     # Map Info goes here, gets read sequentially.
-        if(fileType == "csv"):
-            # Double checked that its a CSV file being read...
-            print("Found CSV File '"+m.name+"'. Adding to Maps...")
-            with open(m, newline="") as mapFile:
-                # Open file, get dictionary reader.
-                mapReader = csv.DictReader(mapFile)
-                for r in mapReader:
-                    # Check that the 'meta' row isn't empty.
-                    if(r["meta"] != "" and r["meta"] != None):
-                        # Add meta info to local map info list.
-                        mi.append(r["meta"])
-
-                # Create new map object, write meta info into it
-                newMap = Map(mi[0],mi[1],mi[2],mi[3],mi[4],mi[5])
-                # Get filepath for map, then append to Maps List.
-                newMap.updatePath(m.path)
-                mapList.append(newMap)
-        else:
-            # Different file to a csv being read. Skip it.
-            print("Found a non CSV file '"+m.name+"' in map directory. Skipping...")
-            continue
-
-# No map files loaded
-if(mapList == []):
-    input("No maps found! Cannot run a game without a map!\nPress [ENTER] to exit!")
-    quit()
-
-# Create namelists for maps for map selection screen.
-mapNames    = []
-shortNames  = []
-mapToPick = None
-confirmed = None
-for m in mapList:
-    mapNames.append(m.name)
-    shortNames.append(m.sname)
-
-mapInfo = "Pick a Map by typing its short name.\nExample: "+shortNames[0]+" = "+mapNames[0]
-print(mapInfo)
-print(mapNames)
-print(shortNames)
-
-while(mapToPick == None):
-    
-    i = input(">")
-    preInput = i.upper()
-    
-    if(preInput in shortNames):
-        # Player entered a valid map name.
-        mapIndex = shortNames.index(preInput)
-
-        if(isinstance(mapList[mapIndex],Map)):
-            mapToPick = mapList[mapIndex]
-            print("You have chosen \'"+mapToPick.name+"\'.")
-            print(mapToPick.desc)
-            print("Rooms: "+str(mapToPick.rCount)+" | Min Fighters: "+str(mapToPick.minFig)+" | Max Fighters: "+str(mapToPick.maxFig))
-            print("Would you like to fight on this map? (Y/N)")
-            
-            # Give additional map info, let player decide if its for them.
-            while(confirmed == None):
-                pick = input(">")
-                if(pick.upper() == "Y"):
-                    confirmed = True
-                elif(pick.upper() == "N"):
-                    confirmed = False
-                else:
-                    print("Please enter Y or N.")
-            if(confirmed == True):
-                print("Map \'"+mapList[mapIndex].name+"\' selected!")
-                input("Press [ENTER] To Proceed!")
-            else:
-                # While loop continues.
-                # Reset important loop deciders.
-                mapToPick = None
-                confirmed = None
-
-                print(mapInfo)
-                print(mapNames)
-                print(shortNames)
-        else:
-            print("Somehow, a non-map is in the map list. C'mon now...")
-            quit()
-        
-        # Old code.
-        #mapName = preInput[:-4]
-        #print("Map \'"+mapName+"\' selected!")
-        #input("Press [ENTER] To Proceed!")
-        #mapToPick = preInput
-    else:
-        print("Not a valid Map!")
-
-roomCSV = mapToPick.path
-
-with open(roomCSV, newline="") as csvfile:
-    #CSV Function to read rooms from a file
-    print("CSV Room import function, starting on Static elements...")
-
-    #pass through first time to populate static elements of rooms and add the rooms to roomlist
-    reader = csv.DictReader(csvfile)
-    for row in reader:
-        newRoom = Room(int(row["id"]),row["name"],row["desc"])
-        roomList.append(newRoom)
-        #print("New room id: "+str(newRoom.id)+" appended to room list.")
-    print(roomList)
-    print("CSV Room import function, static elements finishing...")
-
-with open(roomCSV, newline="") as csvfile:
-    #pass through a second time to add dynamic elements (mobs, objects, exits...)
-    #(it would freak out if I did this before, as it would look for things that won't exist yet)
-    print("CSV Room import function, starting on Dynamic elements...")
-    reader = csv.DictReader(csvfile)
-    for row in reader:
-        RoomID = int(row["id"])
-        updateRoom = roomList[RoomID]
-
-        #Adding Reciprocal Exits
-        if(row["exits_r"] != ""):
-            exits = row["exits_r"]
-            exitsList = exits.split("|")
-            for newExit in exitsList:
-                updateRoom.addExit(roomList[int(newExit)],True)
-
-        #adding One-Way exits.
-        if(row["exits_s"] != ""):
-            exits = row["exits_s"]
-            exitsList = exits.split("|")
-            for newExit in exitsList:
-                updateRoom.addExit(roomList[int(newExit)],False)
-    
-    print("CSV Room import function, dynamic elements finishing...")
-
-
+roomList = []
+hazardList = []
+mapList = getMapFiles(mapDir)
