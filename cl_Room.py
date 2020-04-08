@@ -320,7 +320,13 @@ def getMapFiles(md):
                             mi.append(r["meta"])
     
                     # Create new map object, write meta info into it
-                    newMap = Map(mi[0],mi[1],mi[2],mi[3],mi[4],mi[5])
+                    newMap = Map(mi[0], # Name
+                                 mi[1], # Short Name
+                                 mi[2], # Description
+                                 mi[3], # Room Count
+                                 mi[4], # Minimum Fighters
+                                 mi[5], # Maximum Fighters
+                                 mi[6]) # Image
                     # Get filepath for map, then append to Maps List.
                     newMap.updatePath(m.path)
                     ml.append(newMap)

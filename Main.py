@@ -2,10 +2,12 @@
 from cl_Game import GameSystem as gameSys
 import cl_Room, cl_Mob, cl_Postgame
 
-useGUI = False
+useGUI = True
 
 if(useGUI == True):
     import cl_GUI
+    gui = cl_GUI.startGUI()
+
 else:
     cl_Room.mapSelection()
     cl_Mob.chooseFighters()

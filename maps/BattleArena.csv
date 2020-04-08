@@ -1,11 +1,11 @@
 meta,id,name,desc,exits_r,exits_s
 Battle Arena,0,Centre of the Arena,"A clear, grey area with white lines on the ground to mark a battle arena.",1|2|3|4,
 ARENA,1,NW of Centre,"An area to the northwest of the centre, with red accents marking the new space.",2|3|5|21|23,
-A four-pointed star battlefield.,2,NE of Centre,"A spot to the northeast of the centre, with blue accents to mark the new area.",8|22|23,
+"A four-pointed star battlefield surrounded by tall towers and long one-way exits, as well as looping off the edge back to the other edge of the arena.",2,NE of Centre,"A spot to the northeast of the centre, with blue accents to mark the new area.",8|22|23,
 25,3,SW of Centre,"A place the southwest of the centre, with yellow accents to mark the locale.",11|21|24,
 12,4,SE of Centre,"A field to the southeast of the centre, with green accents to outline the field.",2|3|14|22|24,
 24,5,Northwest Quadrant,"A red sub-arena with a tower looming over it, and slides to either side of it.",6|7|17,
-,6,NW Southern Slides,A slide which gradually turns from red to yellow.,,11|17
+./img/test.png,6,NW Southern Slides,A slide which gradually turns from red to yellow.,,11|17
 ,7,NW Eastern Slides,A slide which gradually turns from red to blue.,,8|17
 ,8,Northeast Quadrant,"A blue sub-arena with a tower over it, and slides to either side.",9|10|18,
 ,9,NE Western Slides,A slide which gradually turns from blue to red.,,5|18

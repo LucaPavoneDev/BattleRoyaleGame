@@ -26,6 +26,7 @@ class GameSystem(object):
         # Init game control systems
         self.turnCounter = 0
         self.maxTurns = -1
+        self.currentMap = None
 
         # Fighter, Team and Turn Order tracking.
         self.fighterList    = mobList.copy()
@@ -63,6 +64,12 @@ class GameSystem(object):
         self.smallSep = "  -=-=-=-=-=-=-"
 
         print("Game System Initialised!")
+    
+    def updateFighterList(self,newList):
+        self.fighterList    = newList.copy()
+    
+    def updateCurrentMap(self,newMap):
+        self.currentMap     = newMap.copy()
 
     def selectGameMode(self):
         gameModeChosen = False

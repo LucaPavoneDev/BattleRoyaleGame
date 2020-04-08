@@ -1,0 +1,22 @@
+meta,id,name,desc,exits_r,exits_s
+Webway,0,"First Strand, Centre","Near the centre of the web, on the first strand, which is red.",1|7,
+WEB,1,"Second Strand, Centre","Close to the middle of the web, on the second strand, which is orange.",2|8,
+"A web which spikes out in seven directions, with connections at the edge and the centre.",2,"Third Strand, Centre","By the centre of the web, on the third strand, which is yellow.",3|9,
+21,3,"Fourth Strand, Centre","In the middle of the web, on the fourth strand, which is green.",4|10,
+8,4,"Fifth Strand, Centre","Amid the centre of the web, on the fifth strand, which is blue.",5|11,
+20,5,"Sixth Strand, Centre","By the middle of the web, on the sixth strand, which is indigo.",6|12,
+./maps/webway.png,6,"Seventh Strand, Centre","In the centre of the web, on the seventh strand, which is violet.",0|13,
+,7,"First Strand, Middle",This strand is red. It is in the middle of the web.,14,
+,8,"Second Strand, Middle",This strand is orange. It is in the middle of the web.,15,
+,9,"Third Strand, Middle",This strand is yellow. It is in the middle of the web.,16,
+,10,"Fourth Strand, Middle",This strand is green. It is in the middle of the web.,17,
+,11,"Fifth Strand, Middle",This strand is blue. It is in the middle of the web.,18,
+,12,"Sixth Strand, Middle",This strand is indigo. It is in the middle of the web.,19,
+,13,"Seventh Strand, Middle",This strand is violet. It is in the middle of the web.,20,
+,14,"First Strand, Edge","This strand is red, pegged into the side of a cliff.",,13|8
+,15,"Second Strand, Edge","This strand is orange, anchored to a tree.",,7|9
+,16,"Third Strand, Edge","This strand is yellow, connected to a gantry.",,8|10
+,17,"Fourth Strand, Edge","This strand is green, attached to a pylon.",,9|11
+,18,"Fifth Strand, Edge","This strand is blue, dangling by threads.",,10|12
+,19,"Sixth Strand, Edge","This strand is indigo, pinned with many thumbtacks.",,11|13
+,20,"Seventh Strand, Edge","This strand is violet, hanging as an awning.",,12|7
