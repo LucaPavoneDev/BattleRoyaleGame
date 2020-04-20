@@ -295,7 +295,7 @@ class Map(object):
 
 def getMapFiles(md):
     ml = []
-    mapFileList = os.scandir(mapDir)
+    mapFileList = os.scandir(md)
 
     if(mapFileList == []):
         # No files at all in the map directory
@@ -445,6 +445,52 @@ def mapSelection():
                     updateRoom.addExit(roomList[int(newExit)],False)
         
         print("CSV Room import function, dynamic elements finishing...")
+
+def buildMap(m):
+    # Builds a map out of a given Map object.
+    if(isinstance(m,Map)):
+        # It's a map.
+        clearRooms()
+        mapFile = m.path
+        
+        # Create rooms.
+        with open(mapFile,newline="") as rooms:
+            read = csv.DictReader(rooms)
+            for r in read:
+                newRoom = Room(int(r["id"]),r["name"],r["desc"])
+                roomList.append(newRoom)
+            print()
+        
+        # Add exits to rooms.
+        with open(mapFile,newline="") as exits:
+            read = csv.DictReader(exits)
+            for e in read:
+                roomID = int(e["id"])
+                roomTo = roomList[roomID]
+                
+                # Two-Way Exits
+                if(e["exits_r"] != ""):
+                    exits = e["exits_r"]
+                    eList = exits.split("|")
+                    for ne in eList:
+                        roomTo.addExit(roomList[int(ne)],True)
+                
+                # One-Way Exits
+                if(e["exits_s"] != ""):
+                    exits = e["exits_r"]
+                    eList = exits.split("|")
+                    for ne in eList:
+                        roomTo.addExit(roomList[int(ne)],False)
+        print("Map Created, with {} rooms.".format(len(roomList)))
+
+def clearRooms():
+    # Clears out the Room List for a new map to be built on it.
+    if roomList != []:
+        del roomList[:]
+        print("Room List cleared.")
+    else:
+        # Room list is already clear.
+        print("Room list is already clear.")
 
 #Add starting locations and exits
 #Create indexed list for rooms to live in and reference from

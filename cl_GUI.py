@@ -2,7 +2,7 @@
 import tkinter as tk
 from tkinter import ttk
 
-from cl_Room import mapList
+from cl_Room import mapList, buildMap, clearRooms
 from cl_Game import GameSystem
 from cl_Mob import mobList, teamList
 
@@ -14,7 +14,17 @@ CONF_outerPad = 4
 # For static images like UI elements and HUD elements.
 DICT_imgs = {"title":"./img/title.png",
              "map_placeholder":"./img/_nomap.png",
-             "fighter_placeholder":"/img/_nofighter.png",
+             "fighter_placeholder":"./img/_nofighter.png",
+             
+             # Icons
+             "heart":"./img/stat_health.png",
+             "skull":"./img/stat_",
+             "atk":  "./img/stat_atk.png",
+             "def":  "./img/stat_def.png",
+             "agi":  "./img/stat_agi.png",
+             "spd":  "./img/stat_spd.png",
+             "mag":  "./img/stat_mag.png",
+             "mdf":  "./img/stat_mdf.png",
              }
 
 # Text Dictionary
@@ -32,11 +42,11 @@ DICT_txts = {"Title_newGame":"New Battle",
              "mapSel_minMax":"Min./Max. Fighters:",
              "mapSel_back":"Back to Title",
              "mapSel_next":"Next",
-             "mobSel_fighterList":"Fighters",
-             "mobSel_fighterPics":"Fighter's Portraits",
+             "mobSel_fighterList":"Fighter List",
+             "mobSel_fighterBio":"Fighter Information",
+             "mobSel_fighterAttacks":"Attacks",
              "mobSel_teamArrangement":"Team Setup",
-             "mobSel_curMap":"Selected Map",
-             "mobSel_":"",
+             "mobSel_curMap":"Selected Map:",
              "mobSel_back":"Back to Map Selection",
              "mobSel_next":"Next",
              "teamSel_":"",
@@ -45,8 +55,8 @@ DICT_txts = {"Title_newGame":"New Battle",
              "teamSel_":"",
              "teamSel_back":"Back to Fighter Selection",
              "teamSel_next":"Start the Fight!",
-             "gameGuide_intro":"",
-             "gameGuide_maps":"",
+             "gameGuide_intro":"Welcome to the Battle Royale Game. This is a zero-player game that plays out automatically as computerised characters fight it out for your amusement.",
+             "gameGuide_maps":"Maps are stored in the \'./maps\' directory. Maps have a list of rooms, their exits, and some metadata about the whole of the map.",
              "gameGuide_mobs":"",
              "gameGuide_modes":"",
              "gameGuide_rooms":"",
@@ -93,6 +103,9 @@ class MainApp(tk.Tk):
         
         #print(self.winfo_children())
         #print("Frames Switched.")
+    
+    def getCurrentMap(self):
+        return self._gameSystem.currentMap
 
 class TitleWin(Window):
     # Title Screen
@@ -176,6 +189,8 @@ class MapSelect(Window):
             setMapIndex()
             m = mapList[self.mapIndex]
             
+            master._gameSystem.updateCurrentMap(m)
+            
             # Assign to GUI vars
             GUI_mapName.set(m.name)
             GUI_mapShort.set(m.sname)
@@ -200,7 +215,7 @@ class MapSelect(Window):
         optFrame = tk.LabelFrame(self,text="Map Selection")
         optFrame.grid(row=0,column=2,sticky="ns")
         
-        actFrame = tk.LabelFrame(self,text="Actions")
+        actFrame = tk.Frame(self)
         actFrame.grid(row=1,column=0,columnspan=3,sticky="ew")
         
         # Map Display Frame
@@ -314,18 +329,29 @@ class FighterSelect(Window):
         GUI_statMAG = tk.IntVar()
         GUI_statMDF = tk.IntVar()
         
+        # Team Setup
+        GUI_teamType = tk.StringVar()
+        GUI_teamType.set("LMS")
+        GUI_fCount = tk.IntVar()
+        GUI_fCount.set(len(mobList))
+        
+        # Current Map
+        GUI_curMap  = tk.StringVar()
+        GUI_curMap.set(master.getCurrentMap())
+        
         ## Functions ##
         ###############
         def callback(event=None):
             # Super simple callback function for whatever.
             print(event)
-            return event
-        
-        def updateFighterIndex(event=None):
-            # Update fighter index based on position of a listbox later.
-            self.fighterIndex = 0
+            return event        
         
         def updateFighter(event=None):
+            if(len(fighterList.curselection()) > 0):
+                self.fighterIndex = fighterList.curselection()[0]
+            else:
+                self.fighterIndex = 0
+            
             fi = self.fighterIndex
             
             GUI_fName.set(mobList[fi].name)
@@ -341,34 +367,179 @@ class FighterSelect(Window):
             GUI_statSPD.set(stats["SPD"])
             GUI_statMAG.set(stats["MAG"])
             GUI_statMDF.set(stats["MDF"])
+            
+            try:
+                fighterImg.config(file=mobList[self.fighterIndex].image)
+            except:
+                # Image not present. Change image to placeholder.
+                fighterImg.config(file=DICT_imgs["fighter_placeholder"])
+        
+        def updateTeams(event=None):
+            print(GUI_teamType.get())
         
         ## Widgets ##
         #############
         # Frame Setup
-        fighterFrame = tk.LabelFrame(self,text="Fighter Display")
-        fighterFrame.grid(row=0,column=0)
-        
-        teamFrame = tk.Frame(self)
-        teamFrame.grid(row=1,column=0)
-        
-        listFrame = tk.Frame(self)
-        listFrame.grid(row=0,column=1,rowspan=2)
-        
+        fighterFrame = tk.LabelFrame(self,text=DICT_txts["mobSel_fighterBio"])
+        teamFrame = tk.LabelFrame(self,text=DICT_txts["mobSel_teamArrangement"])
+        listFrame = tk.LabelFrame(self,text=DICT_txts["mobSel_fighterList"])
         actionFrame = tk.Frame(self)
-        actionFrame.grid(row=2,column=0,columnspan=2)
+        
+        fighterFrame.grid(row=0,column=0,sticky="nsew")
+        teamFrame.grid(row=1,column=0,sticky="nsew")
+        listFrame.grid(row=0,column=1,rowspan=2,sticky="nsew")
+        actionFrame.grid(row=2,column=0,columnspan=2,sticky="nsew")
+        
+        # Sizing/Spacing for main widgets.
+        self.grid_rowconfigure(0,minsize=120)
+        self.grid_columnconfigure(0,minsize=480)
         
         # Figher Display Frame
         ######################
-        fighterImg  = tk.PhotoImage(file=mapList[self.fighterIndex].image)
+        try:
+            fighterImg  = tk.PhotoImage(file=mobList[self.fighterIndex].image)
+        except tk.TclError:
+            # Image not present. Change image to placeholder.
+            fighterImg  = tk.PhotoImage(file=DICT_imgs["fighter_placeholder"])
+        fighterFace = tk.Label(fighterFrame,image=fighterImg)
+        fighterFace.fighterImg = fighterImg
+        
+        # Fighter Details
+        fighterName = tk.Label(fighterFrame,textvariable=GUI_fName)
+        fighterShort= tk.Label(fighterFrame,textvariable=GUI_fSname)
+        fighterDesc = tk.Label(fighterFrame,textvariable=GUI_fDesc,width=35)
+        fighterDesc.config(wraplength=240,justify=tk.LEFT)
+        
+        # Labels + Stat Images
+        icoATK      = tk.PhotoImage(file=DICT_imgs["atk"])
+        icoDEF      = tk.PhotoImage(file=DICT_imgs["def"])
+        icoAGI      = tk.PhotoImage(file=DICT_imgs["agi"])
+        icoSPD      = tk.PhotoImage(file=DICT_imgs["spd"])
+        icoMAG      = tk.PhotoImage(file=DICT_imgs["mag"])
+        icoMDF      = tk.PhotoImage(file=DICT_imgs["mdf"])
+        
+        labATK      = tk.Label(fighterFrame,image=icoATK)
+        labDEF      = tk.Label(fighterFrame,image=icoDEF)
+        labAGI      = tk.Label(fighterFrame,image=icoAGI)
+        labSPD      = tk.Label(fighterFrame,image=icoSPD)
+        labMAG      = tk.Label(fighterFrame,image=icoMAG)
+        labMDF      = tk.Label(fighterFrame,image=icoMDF)
+        
+        labATK.icoATK = icoATK
+        labDEF.icoDEF = icoDEF
+        labAGI.icoAGI = icoAGI
+        labSPD.icoSPD = icoSPD
+        labMAG.icoMAG = icoMAG
+        labMDF.icoMDF = icoMDF
+        
+        # Stats
+        fighterATK  = tk.Label(fighterFrame,textvariable=GUI_statATK)
+        fighterDEF  = tk.Label(fighterFrame,textvariable=GUI_statDEF)
+        fighterAGI  = tk.Label(fighterFrame,textvariable=GUI_statAGI)
+        fighterSPD  = tk.Label(fighterFrame,textvariable=GUI_statSPD)
+        fighterMAG  = tk.Label(fighterFrame,textvariable=GUI_statMAG)
+        fighterMDF  = tk.Label(fighterFrame,textvariable=GUI_statMDF)
+        
+        atksLabel   = tk.Label(fighterFrame,text=DICT_txts["mobSel_fighterAttacks"])
+        fighterAtks = tk.Listbox(fighterFrame,
+                                 width=24,height=4,
+                                 listvariable=GUI_attacks,
+                                 selectmode="SINGLE",
+                                 activestyle="dotbox")
+        atkInfo     = tk.Label(fighterFrame)
+        
+        # Gridding Image
+        fighterFace.grid(row=0,column=0,rowspan=5)
+        
+        # Gridding Main Details
+        fighterName.grid(row=0,column=1,columnspan=2)
+        fighterShort.grid(row=0,column=3,columnspan=2)
+        fighterDesc.grid(row=1,column=1,columnspan=4)
+        fighterDesc.grid_columnconfigure(1,minsize=480)
+        
+        # Gridding Statistics and Attacks
+        labATK.grid(row=2,column=1)
+        labDEF.grid(row=2,column=3)
+        labAGI.grid(row=3,column=1)
+        labSPD.grid(row=3,column=3)
+        labMAG.grid(row=4,column=1)
+        labMDF.grid(row=4,column=3)
+        
+        fighterATK.grid(row=2,column=2)
+        fighterDEF.grid(row=2,column=4)
+        fighterAGI.grid(row=3,column=2)
+        fighterSPD.grid(row=3,column=4)
+        fighterMAG.grid(row=4,column=2)
+        fighterMDF.grid(row=4,column=4)
+        
+        atksLabel.grid(row=0,column=5)
+        fighterAtks.grid(row=1,column=5,rowspan=3)
+        atkInfo.grid(row=4,column=5)
+        
+        for c in [labATK,labDEF,labAGI,labSPD,labMAG,labMDF]:
+            c.grid_configure(sticky="e")
+        
+        for c in [fighterATK,fighterDEF,fighterAGI,
+                  fighterSPD,fighterMAG,fighterMDF]:
+            c.grid_configure(sticky="w")
         
         # Team Setup/Game Mode Frame
         ############################
+        # Radio Buttons
+        it = 0
+        for txt,var in [("Last Man Standing","LMS"),
+                        ("Last Team Standing","LTS"),
+                        ("Doubles/Duos","DUOS"),
+                        ("Triples/Tris","TRIS"),
+                        ("Quartets/Quads","QUADS")]:
+            # Create buttons and grid them dynamically.
+            b = tk.Radiobutton(teamFrame,text=txt,
+                               variable=GUI_teamType,value=var,
+                               command=updateTeams)
+            b.grid(row=it,column=0, sticky="w")
+            it += 1
+        
         
         # Fighter List Frame
         ####################
+        fighterScroll = tk.Scrollbar(listFrame)
+        fighterList = tk.Listbox(listFrame,
+                                 width=24,
+                                 height=16,
+                                 listvariable=GUI_fList,
+                                 selectmode="SINGLE",
+                                 activestyle="dotbox",
+                                 yscrollcommand=fighterScroll.set)
+        fighterScroll.config(command=fighterList.yview)
+        fighterList.bind("<<ListboxSelect>>",updateFighter)
+
+        fighterList.grid(row=0,column=0)
+        fighterScroll.grid(row=0,column=1,sticky="wns")
+        
         
         # Action Button Frame
         #####################
+        backButton  = tk.Button(actionFrame,text=DICT_txts["mobSel_back"],
+                                command=lambda: master.switchFrames(MapSelect))
+        mapLabel    = tk.Label(actionFrame,text=DICT_txts["mobSel_curMap"])
+        mapGUI      = tk.Label(actionFrame,textvariable=GUI_curMap)
+        playButton  = tk.Button(actionFrame,text=DICT_txts["mobSel_next"],
+                                command=lambda: master.switchFrames(TitleWin))
+        
+        backButton.grid(row=0,column=0)
+        mapLabel.grid(row=0,column=1)
+        mapGUI.grid(row=0,column=2)
+        playButton.grid(row=0,column=3)
+        
+        ## Padding Gridding
+        ###################
+        for c in self.winfo_children():
+            c.grid_configure(padx=CONF_innerPad,pady=CONF_innerPad)
+        
+        ## Last Functions
+        #################
+        updateFighter()
+        updateTeams()
         
 
 class GameGuide(Window):

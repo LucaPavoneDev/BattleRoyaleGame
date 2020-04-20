@@ -24,6 +24,7 @@ class Mob(object):
         self.team              = None
         self.score             = 0
         self.stats             = {"ATK":3, "DEF":3, "AGI":3, "SPD":3, "MAG":3, "MDF":3}
+        self.image             = None
 
         #Statistics
         self.maxHitpoints      = mobHP
@@ -102,6 +103,9 @@ class Mob(object):
         prevType = self.type
         self.type = newType
         print(self.name+" was a "+prevType+", and is now a "+self.type)
+    
+    def updateImage(self,prefix="/fighters/img/"):
+        self.image = prefix+self.sname.lower()+".png"
 
     # Change team
     def changeTeam(self,newTeam):
@@ -114,7 +118,6 @@ class Mob(object):
     
     # Remove self from team.
     def leaveTeam(self):
-        print(self.name+" has left "+self.team.name+".")
         self.team = None
     
     def locateTeammates(self):
@@ -754,6 +757,7 @@ class Mob(object):
                 ai_talk     = int(r["ai_talk"])
                 
                 newMob.ai_talk = ai_talk
+                newMob.updateImage("./fighters/img/")
                 
                 mobList.append(newMob)
         

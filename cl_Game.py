@@ -16,6 +16,7 @@ from random import randint
 from random import choice
 from random import shuffle
 from cl_Room import roomList
+from cl_Room import mapList
 from cl_Room import hazardList
 from cl_Mob import mobList
 from cl_Mob import teamList
@@ -27,6 +28,7 @@ class GameSystem(object):
         self.turnCounter = 0
         self.maxTurns = -1
         self.currentMap = None
+        self.allMaps    = mapList
 
         # Fighter, Team and Turn Order tracking.
         self.fighterList    = mobList.copy()
@@ -65,18 +67,45 @@ class GameSystem(object):
 
         print("Game System Initialised!")
     
+    def refreshGameSystem(self):
+        # TODO: clear all match data for a new match, refresh major variables.
+        
+        # Refresh all major data. Reload maps if possible.
+        self.turnCounter = 0
+        self.maxTurns = -1
+        self.currentMap = None
+        self.allMaps    = mapList
+
+        # Fighter, Team and Turn Order tracking.
+        self.fighterList    = mobList.copy()
+        self.teamsList      = teamList.copy()
+        self.turnOrder      = self.fighterList.copy()
+        self.teamsList      = []    # This gets filled in when needed.
+
+        # Dead Lists
+        self.deadList       = []
+        self.deadTeams      = []        
+
+        # Individual Death Statistics
+        self.diedOn         = []
+        self.diedWhere      = []
+        self.killedBy       = []
+        self.killedWith     = []
+    
     def updateFighterList(self,newList):
         self.fighterList    = newList.copy()
+        print("gameSystem: Current Fighter List Updated")
     
     def updateCurrentMap(self,newMap):
-        self.currentMap     = newMap.copy()
-
-    def selectGameMode(self):
-        gameModeChosen = False
-        # Put in default choices.
+        self.currentMap     = newMap
+        print("gameSystem: Current Map Updated")
+    
+    def checkGameModes(self):
+        # Figures out which game modes are selectable ahead of time.
+        # Returns available choices, and number of fighters.
         choices = ["LAST MAN STANDING"]
         shorts = ["LMS"]
-        # Check fighter count and add extra modes.
+        
         fCount = len(self.fighterList)
         if(fCount % 2 == 0):
             if(fCount >= 10):
@@ -95,34 +124,57 @@ class GameSystem(object):
             choices.append("QUARTETS BATTLE")
             shorts.append("QUADS")
         
-        question = ("Choose a Game Mode. There are "+str(fCount)+" fighters.\n"+str(choices)+
-                    "\n"+str(shorts)+"\nEnter a choice or a shorthand.")
-        print(question)
-        while(gameModeChosen == False):
-            choice = input(">").upper()
-            if(choice == ""):
-                # Empty default.
-                # Repeat question.
-                continue
-            elif(choice in shorts or choice in choices):
-                # What they entered is a shorthand or full name.
-                if(choice == "LAST MAN STANDING" or choice == "LMS"):
-                    self.gameMode = "LMS"
-                if(choice == "LAST TEAM STANDING" or choice == "LTS"):
-                    self.gameMode = "LTS"
-                if(choice == "DOUBLES BATTLE" or choice == "DUOS"):
-                    self.gameMode = "DUOS"
-                if(choice == "TRIPLES BATTLE" or choice == "TRIS"):
-                    self.gameMode = "TRIS"
-                if(choice == "QUARTETS BATTLE" or choice == "QUADS"):
-                    self.gameMode = "QUADS"
-                input("Game Mode is now '"+self.gameMode+"'. [Hit ENTER]")
-                
-                gameModeChosen = True
+        return (choices,shorts,fCount)
+
+    def selectGameMode(self,select=None):
+        # Is there any argument passed?
+        if(select == None):
+            #No? Then query what game mode the user wants via Console Commands.
+            gameModeChosen = False
+            # Put in default choices.
+            
+            gmc = self.checkGameModes()
+            
+            choices = gmc[0]
+            shorts  = gmc[1]
+            fCount  = gmc[2]
+            # Check fighter count and add extra modes.
+            
+            question = ("Choose a Game Mode. There are "+str(fCount)+" fighters.\n"+str(choices)+
+                        "\n"+str(shorts)+"\nEnter a choice or a shorthand.")
+            print(question)
+            while(gameModeChosen == False):
+                choice = input(">").upper()
+                if(choice == ""):
+                    # Empty default.
+                    # Repeat question.
+                    continue
+                elif(choice in shorts or choice in choices):
+                    # What they entered is a shorthand or full name.
+                    if(choice == "LAST MAN STANDING" or choice == "LMS"):
+                        self.gameMode = "LMS"
+                    if(choice == "LAST TEAM STANDING" or choice == "LTS"):
+                        self.gameMode = "LTS"
+                    if(choice == "DOUBLES BATTLE" or choice == "DUOS"):
+                        self.gameMode = "DUOS"
+                    if(choice == "TRIPLES BATTLE" or choice == "TRIS"):
+                        self.gameMode = "TRIS"
+                    if(choice == "QUARTETS BATTLE" or choice == "QUADS"):
+                        self.gameMode = "QUADS"
+                    input("Game Mode is now '"+self.gameMode+"'. [Hit ENTER]")
+                    
+                    gameModeChosen = True
+                else:
+                    # They entered something else completely.
+                    # Repeat question!
+                    continue
+        else:
+            # Use what ever value is supplied in the argument. Must be a string.
+            if(isinstance(select,str)):
+                self.gameMode = select
+                print("Game Mode set to "+self.gameMode)
             else:
-                # They entered something else completely.
-                # Repeat question!
-                continue
+                print("Game Mode not a string. Not changed.")
 
     def pregameTeamAssignment(self,originalTeams=teamList):
         self.teamsList = originalTeams.copy()
